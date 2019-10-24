@@ -3,7 +3,7 @@
 在线地址： http://s1rlucbcryqk.leanapp.cn/
 
 一个简单的todolist小应用
-> 使用的的技术栈:react、redux、bootstrap、json-server等
+> 使用的技术栈:react、redux、bootstrap、json-server等
 
 在线地址： http://s1rlucbcryqk.leanapp.cn/
 
