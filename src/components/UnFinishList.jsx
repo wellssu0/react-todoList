@@ -1,51 +1,64 @@
-import React,{ Component } from 'react'
-import PropTypes from 'prop-types'
+import React, {memo} from 'react'
+import { connect } from 'react-redux'
 
+import { IoMdRadioButtonOff, IoIosClose, IoMdCheckmarkCircleOutline } from 'react-icons/io';
+import { Color } from '../utils'
+import * as actionCreators from '../actionCreators'
 
-export default class UnFinishList extends Component{
-  
-  static propTypes = {
-    items:PropTypes.array.isRequired,
-    onFinishItem:PropTypes.func.isRequired,
-    onDeleteItem:PropTypes.func.isRequired
-  }
-  // componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
-  //   this.setState({
-  //     items: nextProps.items
-  //   });
-  // }
- 
-  handleFinish = (event,item) =>{
-    event.preventDefault()
-    this.props.onFinishItem(item)
-  }
-  render() {
-    const { items ,onDeleteItem } = this.props 
+const UnFinishList = props =>{
+    const { itemsUnCompleted ,handleCompletedItem, handleDeleteItem } = props
+
     return (
+      <React.Fragment>
+      {itemsUnCompleted.length > 0 &&
+        <p className="text-center text-capitalize text-muted">tasks</p>
+      }
       <ul className='list-group mx-3 my-3'>
         {
-          items.map(item =>(
-            <li className="list-group-item justify-content-between align-content-center d-flex"
-              key={item.id}
+          itemsUnCompleted.map(item=>(
+            <li className="d-flex list-group-item justify-content-between align-content-center " key={item.id}
             >
-              <span className="col-2">
-                <ion-icon name="heart-empty"></ion-icon>
-              </span>
-              <span className="col-8" >{item.content}</span>
-              <a href="#" className="col-1"
-                onClick={event => this.handleFinish(event,item)}
+              <div style={{width:"24px",height:"24px",margin:"auto 0"}}> 
+                {!item.isCompleted &&
+                  <IoMdRadioButtonOff 
+                    style={{width:"24px",height:"24px",color:`${item.modeColor}`,cursor:'pointer'}}
+                    onClick={()=>handleCompletedItem(item)}
+                  />
+                }
+           
+
+                <IoMdCheckmarkCircleOutline 
+                className={item.isCompleted ? "iicon ishow" : "iicon"}
+                style={{width:"24px",height:"24px",color:`${item.modeColor}`}}/>
+            
+              </div>
+
+              <span className="pl-3 pr-3" style={{color:`${item.modeColor}`}}>{item.content}</span>
+              <div style={{width:"24px",height:"24px",margin:"auto 0",cursor:'pointer'}}
+                onClick={()=>handleDeleteItem(item)}
               >
-                <ion-icon name="checkmark"></ion-icon>
-              </a>
-              <a href="#" className="col-1"
-                onClick={()=>{onDeleteItem(item)}}
-              >
-                <ion-icon name="close"></ion-icon>
-              </a>
+                <IoIosClose style={{width:"24px",height:"24px",color:`${Color.info}`}}/>
+              </div>
             </li>
           ))
         }
       </ul>
+      </React.Fragment>
     )
-  }
 }
+
+const mapState = state => ({
+  itemsUnCompleted:state.itemsUnCompleted,
+})
+const mapDispatch = dispatch => ({
+  handleDeleteItem(item){
+    dispatch(actionCreators.deleteItemAction(item))
+  },
+  handleCompletedItem(item){
+    console.log(item.isCompleted)
+    dispatch(actionCreators.setListIsCompletedAction(item))
+    item.endTimestamp = new Date().getTime()
+    dispatch(actionCreators.switchCompletedItemAction(item))
+  }
+})
+export default memo(connect(mapState,mapDispatch)(UnFinishList))
